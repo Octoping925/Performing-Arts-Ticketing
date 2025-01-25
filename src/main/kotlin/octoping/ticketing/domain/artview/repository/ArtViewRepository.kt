@@ -1,10 +1,8 @@
 package octoping.ticketing.domain.artview.repository
 
 import octoping.ticketing.domain.artview.model.ArtView
-import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
-@Repository
 interface ArtViewRepository {
     fun save(artView: ArtView): ArtView
 
