@@ -8,10 +8,7 @@ interface SeatLockRepository {
         userId: Long,
     )
 
-    fun unlockSeat(
-        seatId: Long,
-        userId: Long,
-    )
+    fun unlockSeat(seatId: Long)
 
     fun isLocked(seatId: Long): Boolean
 

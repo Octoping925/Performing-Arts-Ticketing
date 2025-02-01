@@ -4,28 +4,22 @@ import octoping.ticketing.api.controller.arts.schema.ArtItemSchema
 import octoping.ticketing.domain.arts.repository.ArtRepository
 import octoping.ticketing.domain.arts.schema.ArtInfo
 import octoping.ticketing.domain.exception.NotFoundException
-import octoping.ticketing.domain.price.repository.ArtPriceRepository
+import octoping.ticketing.domain.price.repository.SeatPriceRepository
 import org.springframework.stereotype.Service
 
 @Service
 class ArtService(
     private val artRepository: ArtRepository,
-    private val artPriceRepository: ArtPriceRepository,
+    private val seatPriceRepository: SeatPriceRepository,
 ) {
     fun getInfoById(artId: Long): ArtInfo {
         val art =
             artRepository.findById(artId)
                 ?: throw NotFoundException("Art not found. id: $artId")
 
-        val price =
-            artPriceRepository.findRecentByArtId(artId)
-                ?: throw NotFoundException("Price not found. artId: $artId")
-
         return ArtInfo(
             id = art.id,
             name = art.name,
-            basePrice = price.basePrice,
-            discountedPrice = price.discountedPrice,
             startDate = art.startDate,
             endDate = art.endDate,
         )

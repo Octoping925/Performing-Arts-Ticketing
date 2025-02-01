@@ -41,10 +41,7 @@ class SeatLockRepositoryImpl(
         seatLockRedisRepository.save(seatLock)
     }
 
-    override fun unlockSeat(
-        seatId: Long,
-        userId: Long,
-    ) {
+    override fun unlockSeat(seatId: Long) {
         val seatLocks = seatLockRedisRepository.findBySeatId(seatId)
 
         if (seatLocks.isEmpty()) {
@@ -55,12 +52,7 @@ class SeatLockRepositoryImpl(
             throw SeatLockException.MULTIPLE_LOCKS_FOUND
         }
 
-        val seatLock = seatLocks[0]
-        if (seatLock.canUnlock(userId)) {
-            //
-        }
-
-        seatLockRedisRepository.delete(seatLock)
+        seatLockRedisRepository.delete(seatLocks[0])
     }
 
     override fun isLocked(seatId: Long) = seatLockRedisRepository.existsBySeatId(seatId)

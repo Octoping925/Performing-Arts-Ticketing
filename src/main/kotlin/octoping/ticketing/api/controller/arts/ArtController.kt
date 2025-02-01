@@ -26,8 +26,6 @@ class ArtController(
         return ArtInfoResponseDTO(
             id = artInfo.id,
             name = artInfo.name,
-            basePrice = artInfo.basePrice,
-            discountedPrice = artInfo.discountedPrice,
             startDate = artInfo.startDate,
             endDate = artInfo.endDate,
         )
@@ -50,8 +48,8 @@ class ArtController(
     ) {
         priceService.changeArtPrice(
             artId = artId,
-            basePrice = request.basePrice,
-            discountedPrice = request.discountPrice,
+            artSeatId = request.artSeatId,
+            price = request.basePrice,
         )
     }
 
