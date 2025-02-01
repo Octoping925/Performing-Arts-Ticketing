@@ -1,6 +1,8 @@
 package octoping.ticketing.api.controller.seats
 
 import octoping.ticketing.domain.seats.service.SeatService
+import octoping.ticketing.persistence.model.seats.SeatLockException
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -19,12 +21,18 @@ class SeatController(
     fun reserveSeat(
         @PathVariable artId: Long,
         @PathVariable seatId: Long,
-    ) {
+    ): ResponseEntity<String> {
         /*
-         TODO: 사람이 결제 창에 들어간다면 그래도 7분 안에는 결제를 하거나 취소를 할 거란 가설.
-          결제창에 들어가면 Redis에 키를 저장하고, 결제가 완료되면 Redis에서 삭제한다. 결제가 너무 오래 걸려 Redis에 키가 없을 경우 빠꾸 먹이고 다시 시도해주세요 라고 띄운다.
+          사람이 결제 창에 들어간다면 그래도 7분 안에는 결제를 하거나 취소를 할 거란 가설.
+          결제창에 들어가면 Redis에 키를 저장하고, 결제가 완료되면 Redis에서 삭제한다.
+          결제가 너무 오래 걸려 Redis에 키가 없을 경우 빠꾸 먹이고 다시 시도해주세요 라고 띄운다.
          */
-        seatService.lockSeat(seatId, 1)
+        try {
+            seatService.lockSeat(seatId, 1)
+            return ResponseEntity.ok().body("예약 성공")
+        } catch (e: SeatLockException) {
+            return ResponseEntity.badRequest().body("이미 선택된 좌석입니다.")
+        }
     }
 
     @PostMapping("/arts/{artId}/seats/{seatId}/purchase")
