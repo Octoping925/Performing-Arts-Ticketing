@@ -12,10 +12,10 @@ internal class ArtPriceTest : AnnotationSpec() {
 
         // when & then
         shouldThrow<ValidationException> {
-            ArtPrice(
+            SeatPrice(
                 artId = 0,
-                basePrice = price,
-                discountedPrice = 1000,
+                seatId = 1,
+                price = price,
             )
         }
     }
@@ -27,10 +27,10 @@ internal class ArtPriceTest : AnnotationSpec() {
 
         // when & then
         shouldThrow<ValidationException> {
-            ArtPrice(
+            SeatPrice(
                 artId = 0,
-                basePrice = price,
-                discountedPrice = 1000,
+                seatId = 1,
+                price = price,
             )
         }
     }
