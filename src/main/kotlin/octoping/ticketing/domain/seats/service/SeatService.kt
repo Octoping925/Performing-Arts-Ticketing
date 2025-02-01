@@ -12,6 +12,7 @@ import octoping.ticketing.domain.seats.repository.SeatRepository
 import octoping.ticketing.domain.ticket.model.Ticket
 import octoping.ticketing.domain.users.exception.UnauthorizedException
 import octoping.ticketing.domain.users.repository.UserRepository
+import octoping.ticketing.persistence.model.seats.SeatLockException
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -30,9 +31,8 @@ class SeatService(
         seatId: Long,
         userId: Long,
     ) {
-        val seat =
-            seatRepository.findById(seatId)
-                ?: throw NotFoundException("Seat not found")
+        seatRepository.findById(seatId)
+            ?: throw NotFoundException("Seat not found")
 
         seatLockRepository.lockSeat(seatId, userId)
     }
@@ -98,7 +98,7 @@ class SeatService(
     ) {
         val lock =
             seatLockRepository.getSeatLock(seatId)
-                ?: throw NotFoundException("Seat not locked")
+                ?: throw SeatLockException.TOO_LATE
 
         if (!lock.canUnlock(userId)) {
             throw UnauthorizedException()
