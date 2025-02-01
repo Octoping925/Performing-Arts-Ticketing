@@ -1,10 +1,10 @@
 package octoping.ticketing.domain.seats.service
 
-import octoping.ticketing.domain.arts.repository.ArtRepository
 import octoping.ticketing.domain.arts.repository.ArtSeatRepository
 import octoping.ticketing.domain.discount.model.DiscountCoupon
+import octoping.ticketing.domain.discount.model.NoDiscountCoupon
 import octoping.ticketing.domain.exception.NotFoundException
-import octoping.ticketing.domain.price.model.SeatPrice
+import octoping.ticketing.domain.lock.service.LockManager
 import octoping.ticketing.domain.seats.event.SeatPurchaseEvent
 import octoping.ticketing.domain.seats.exception.SeatSoldOutException
 import octoping.ticketing.domain.seats.repository.SeatLockRepository
@@ -21,8 +21,8 @@ class SeatService(
     private val seatRepository: SeatRepository,
     private val artSeatRepository: ArtSeatRepository,
     private val seatLockRepository: SeatLockRepository,
-    private val artRepository: ArtRepository,
     private val userRepository: UserRepository,
+    private val lockManager: LockManager,
     private val eventPublisher: ApplicationEventPublisher,
 ) {
     @Transactional
@@ -42,19 +42,21 @@ class SeatService(
         seatId: Long,
         userId: Long,
     ) {
-        val lock =
-            seatLockRepository.getSeatLock(seatId)
-                ?: return
+        // Seat의 락은 Redis에 저장하지만, 이를 저장할 때에도 동시성 이슈가 생길 수 있어 분산락 구현
+        lockManager.seatPurchaseLock(seatId) {
+            val lock =
+                seatLockRepository.getSeatLock(seatId)
+                    ?: return@seatPurchaseLock
 
-        if (!lock.canUnlock(userId)) {
-            throw UnauthorizedException()
-        }
+            if (!lock.canUnlock(userId)) {
+                throw UnauthorizedException()
+            }
 
-        val seat =
             seatRepository.findById(seatId)
                 ?: throw NotFoundException("Seat not found")
 
-        seatLockRepository.unlockSeat(seatId)
+            seatLockRepository.unlockSeat(seatId)
+        }
     }
 
     @Transactional
@@ -62,8 +64,7 @@ class SeatService(
         artId: Long,
         seatId: Long,
         userId: Long,
-        price: SeatPrice,
-        discountCoupon: DiscountCoupon,
+        discountCoupon: DiscountCoupon = NoDiscountCoupon(),
     ): Ticket {
         validateIsLocked(seatId, userId)
 
@@ -74,10 +75,6 @@ class SeatService(
         if (seat.isSoldOut) {
             throw SeatSoldOutException()
         }
-
-        val art =
-            artRepository.findById(artId)
-                ?: throw NotFoundException("Art not found")
 
         val artSeat =
             artSeatRepository.findById(seat.artSeatId)
