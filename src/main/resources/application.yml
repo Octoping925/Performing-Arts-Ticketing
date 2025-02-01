@@ -8,6 +8,7 @@ spring:
       - jwt
       - file
       - schedule
+      - redis
 
 springdoc:
   swagger-ui:

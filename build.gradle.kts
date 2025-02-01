@@ -34,7 +34,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.kafka:spring-kafka")
     implementation("io.github.oshai:kotlin-logging-jvm:7.0.0")
-    implementation("it.ozimov:embedded-redis:0.7.2")
+//    implementation("it.ozimov:embedded-redis:0.7.2")
 
     runtimeOnly("com.h2database:h2")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
