@@ -1,4 +1,4 @@
-package octoping.ticketing.api.controller.art.request
+package octoping.ticketing.api.controller.arts.request
 
 data class ArtChangePriceRequestDTO(
     val basePrice: Long,

@@ -1,6 +1,6 @@
 package octoping.ticketing.domain.arts.service
 
-import octoping.ticketing.api.controller.art.schema.ArtItemSchema
+import octoping.ticketing.api.controller.arts.schema.ArtItemSchema
 import octoping.ticketing.domain.arts.repository.ArtRepository
 import octoping.ticketing.domain.arts.schema.ArtInfo
 import octoping.ticketing.domain.exception.NotFoundException

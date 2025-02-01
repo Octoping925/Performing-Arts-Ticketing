@@ -1,10 +1,10 @@
-package octoping.ticketing.api.controller.art
+package octoping.ticketing.api.controller.arts
 
 import io.swagger.v3.oas.annotations.Operation
 import jakarta.servlet.http.HttpServletRequest
-import octoping.ticketing.api.controller.art.request.ArtChangePriceRequestDTO
-import octoping.ticketing.api.controller.art.request.ArtInfoResponseDTO
-import octoping.ticketing.api.controller.art.request.ArtListResponseDTO
+import octoping.ticketing.api.controller.arts.request.ArtChangePriceRequestDTO
+import octoping.ticketing.api.controller.arts.request.ArtInfoResponseDTO
+import octoping.ticketing.api.controller.arts.request.ArtListResponseDTO
 import octoping.ticketing.domain.arts.service.ArtService
 import octoping.ticketing.domain.artview.service.ArtViewService
 import octoping.ticketing.domain.price.service.ArtPriceService

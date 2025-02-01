@@ -1,4 +1,4 @@
-package octoping.ticketing.api.controller.art.schema
+package octoping.ticketing.api.controller.arts.schema
 
 import java.time.LocalDate
 
