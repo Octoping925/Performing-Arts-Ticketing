@@ -58,7 +58,7 @@ class ArtController(
     fun getPopularArts(
         @RequestParam(value = "page", defaultValue = "0") page: Int,
         @RequestParam(value = "range", defaultValue = "WEEK") range: String,
-    ): ArtListResponseDTO = ArtListResponseDTO(emptyList(), page)
+    ): ArtListResponseDTO = ArtListResponseDTO(emptyList(), page) // TODO: 구현
 
     @Operation(summary = "공연 조회")
     @PostMapping("/arts/{artId}/view")
