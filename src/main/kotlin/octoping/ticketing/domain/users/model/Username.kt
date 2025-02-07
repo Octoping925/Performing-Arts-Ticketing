@@ -1,6 +1,7 @@
 package octoping.ticketing.domain.users.model
 
-data class Username(
+@JvmInline
+value class Username(
     val value: String,
 ) {
     init {

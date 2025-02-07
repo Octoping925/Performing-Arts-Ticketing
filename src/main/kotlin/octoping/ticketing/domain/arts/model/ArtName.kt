@@ -4,8 +4,9 @@ import octoping.ticketing.domain.exception.ValidationException
 
 private const val MAX_NAME_LENGTH = 100
 
-data class ArtName(
-    val name: String
+@JvmInline
+value class ArtName(
+    val name: String,
 ) {
     init {
         if (name.isBlank()) {
