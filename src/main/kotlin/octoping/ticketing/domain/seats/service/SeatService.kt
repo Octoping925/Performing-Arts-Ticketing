@@ -4,6 +4,7 @@ import octoping.ticketing.domain.arts.repository.ArtSeatRepository
 import octoping.ticketing.domain.discount.model.DiscountCoupon
 import octoping.ticketing.domain.discount.model.NoDiscountCoupon
 import octoping.ticketing.domain.exception.NotFoundException
+import octoping.ticketing.domain.lock.model.Lock
 import octoping.ticketing.domain.lock.service.LockManager
 import octoping.ticketing.domain.seats.event.SeatPurchaseEvent
 import octoping.ticketing.domain.seats.exception.SeatSoldOutException
@@ -43,10 +44,10 @@ class SeatService(
         userId: Long,
     ) {
         // Seat의 락은 Redis에 저장하지만, 이를 저장할 때에도 동시성 이슈가 생길 수 있어 분산락 구현
-        lockManager.seatPurchaseLock(seatId) {
+        lockManager.lock(Lock.SEAT_PURCHASE, seatId) {
             val lock =
                 seatLockRepository.getSeatLock(seatId)
-                    ?: return@seatPurchaseLock
+                    ?: return@lock
 
             if (!lock.canUnlock(userId)) {
                 throw UnauthorizedException()
