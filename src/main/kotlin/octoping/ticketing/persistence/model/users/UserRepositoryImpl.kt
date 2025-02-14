@@ -15,4 +15,7 @@ class UserRepositoryImpl(
         UserEntity.from(user).let {
             userJpaRepository.save(it).toUser()
         }
+
+    override fun saveAll(users: List<User>): List<User> =
+        userJpaRepository.saveAll(users.map(UserEntity::from)).map(UserEntity::toUser)
 }

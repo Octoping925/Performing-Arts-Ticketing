@@ -15,4 +15,9 @@ class SeatRepositoryImpl(
         SeatEntity.from(seat).let {
             seatJpaRepository.save(it).toDomain()
         }
+
+    override fun saveAll(seats: List<Seat>): List<Seat> {
+        val seatEntities = seats.map { SeatEntity.from(it) }
+        return seatJpaRepository.saveAll(seatEntities).map { it.toDomain() }
+    }
 }

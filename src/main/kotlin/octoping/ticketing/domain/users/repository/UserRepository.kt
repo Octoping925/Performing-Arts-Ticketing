@@ -6,4 +6,6 @@ interface UserRepository {
     fun findById(id: Long): User?
 
     fun save(user: User): User
+
+    fun saveAll(users: List<User>): List<User>
 }

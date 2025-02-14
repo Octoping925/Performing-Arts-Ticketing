@@ -3,7 +3,7 @@ spring:
     hibernate:
       ddl-auto: create
     generate-ddl: false
-#    database: mysql
+    database: mysql
     properties:
       hibernate:
         format_sql: true

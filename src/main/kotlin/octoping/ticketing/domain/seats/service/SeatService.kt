@@ -11,6 +11,7 @@ import octoping.ticketing.domain.seats.exception.SeatSoldOutException
 import octoping.ticketing.domain.seats.repository.SeatLockRepository
 import octoping.ticketing.domain.seats.repository.SeatRepository
 import octoping.ticketing.domain.ticket.model.Ticket
+import octoping.ticketing.domain.ticket.repository.TicketRepository
 import octoping.ticketing.domain.users.exception.UnauthorizedException
 import octoping.ticketing.domain.users.repository.UserRepository
 import octoping.ticketing.persistence.model.seats.SeatLockException
@@ -26,6 +27,7 @@ class SeatService(
     private val userRepository: UserRepository,
     private val lockManager: LockManager,
     private val eventPublisher: ApplicationEventPublisher,
+    private val ticketRepository: TicketRepository,
 ) {
     @Transactional
     fun lockSeat(
@@ -88,6 +90,7 @@ class SeatService(
         val ticket = seat.buyTicket(user, artSeat, discountCoupon)
 
         seatRepository.save(seat)
+        ticketRepository.save(ticket)
         eventPublisher.publishEvent(SeatPurchaseEvent(seat.id, user.id))
 
         return ticket
