@@ -6,12 +6,14 @@ spring:
     database: mysql
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
+        show_sql: false
     open-in-view: false
+    show-sql: false
 
-logging:
-  level:
-    org:
-      hibernate:
-        SQL: debug
-        type: info
+#logging:
+#  level:
+#    org:
+#      hibernate:
+#        SQL: debug
+#        type: info
