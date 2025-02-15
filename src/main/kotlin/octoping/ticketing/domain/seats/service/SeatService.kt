@@ -34,10 +34,19 @@ class SeatService(
         seatId: Long,
         userId: Long,
     ) {
-        seatRepository.findById(seatId)
-            ?: throw NotFoundException("Seat not found")
+        // Seat의 락은 Redis에 저장하지만, 이를 저장할 때에도 동시성 이슈가 생길 수 있어 분산락 구현
+        lockManager.lock(Lock.SEAT_PURCHASE, seatId) {
+            val seat = (
+                seatRepository.findById(seatId)
+                    ?: throw NotFoundException("Seat not found")
+            )
 
-        seatLockRepository.lockSeat(seatId, userId)
+            if (seat.isSoldOut) {
+                throw SeatSoldOutException()
+            }
+
+            seatLockRepository.lockSeat(seatId, userId)
+        }
     }
 
     @Transactional
@@ -45,21 +54,18 @@ class SeatService(
         seatId: Long,
         userId: Long,
     ) {
-        // Seat의 락은 Redis에 저장하지만, 이를 저장할 때에도 동시성 이슈가 생길 수 있어 분산락 구현
-        lockManager.lock(Lock.SEAT_PURCHASE, seatId) {
-            val lock =
-                seatLockRepository.getSeatLock(seatId)
-                    ?: return@lock
+        val lock =
+            seatLockRepository.getSeatLock(seatId)
+                ?: return
 
-            if (!lock.canUnlock(userId)) {
-                throw UnauthorizedException()
-            }
-
-            seatRepository.findById(seatId)
-                ?: throw NotFoundException("Seat not found")
-
-            seatLockRepository.unlockSeat(seatId)
+        if (!lock.canUnlock(userId)) {
+            throw UnauthorizedException()
         }
+
+        seatRepository.findById(seatId)
+            ?: throw NotFoundException("Seat not found")
+
+        seatLockRepository.unlockSeat(seatId)
     }
 
     @Transactional
