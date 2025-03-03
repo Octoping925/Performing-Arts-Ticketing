@@ -14,42 +14,34 @@ import octoping.ticketing.domain.seats.service.SeatService
 import octoping.ticketing.domain.ticket.repository.TicketRepository
 import octoping.ticketing.domain.users.model.User
 import octoping.ticketing.domain.users.repository.UserRepository
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.annotation.Rollback
+import org.springframework.test.context.TestConstructor
 import java.time.LocalDate
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
+import kotlin.time.measureTime
 
+@TestConstructor(autowireMode = TestConstructor.AutowireMode.ANNOTATED)
 @SpringBootTest
-class StressTest {
-    @Autowired
-    private lateinit var ticketRepository: TicketRepository
-
-    @Autowired
-    private lateinit var seatService: SeatService
-
-    @Autowired
-    private lateinit var seatPriceRepository: SeatPriceRepository
-
-    @Autowired
-    private lateinit var artSeatRepository: ArtSeatRepository
-
-    @Autowired
-    private lateinit var seatRepository: SeatRepository
-
-    @Autowired
-    lateinit var artRepository: ArtRepository
-
-    @Autowired
-    lateinit var userRepository: UserRepository
-
+class StressTest(
+    @Autowired private val ticketRepository: TicketRepository,
+    @Autowired private val seatService: SeatService,
+    @Autowired private val seatPriceRepository: SeatPriceRepository,
+    @Autowired private val artSeatRepository: ArtSeatRepository,
+    @Autowired private val seatRepository: SeatRepository,
+    @Autowired private val artRepository: ArtRepository,
+    @Autowired private val userRepository: UserRepository,
+) {
     @Rollback(false)
     @Test
+    @Tag("Stress")
     fun stressTest() {
         // given
-        val users = createUser(100000)
+        val users = createUser(3)
         val art = createArt()
         val artSeat = createArtSeat(art)
         val seats = createSeat(art.id, artSeat.id, 1000)
@@ -63,34 +55,44 @@ class StressTest {
         val latch = CountDownLatch(threadCount)
 
         var isAllSuccess = true
-        repeat(threadCount) {
-            executorService.submit {
-                val user = users[it]
-                val seat = seats.random()
-                try {
-                    seatService.lockSeat(
-                        seatId = seat.id,
-                        userId = user.id,
-                    )
 
-                    // sleep
-                    Thread.sleep(3000 + (Math.random() * 1000).toLong())
+        val measureTime =
+            measureTime {
+                repeat(threadCount) {
+                    executorService.submit {
+                        val user = users.random()
+                        val seat = seats.random()
+                        try {
+                            seatService.lockSeat(
+                                seatId = seat.id,
+                                userId = user.id,
+                            )
 
-                    seatService.purchaseSeat(
-                        artId = art.id,
-                        seatId = seat.id,
-                        userId = user.id,
-                    )
-                } catch (e: SeatSoldOutException) {
-                    println("user: ${user.id}, seat: ${seat.id} 예외 발생.." + e.localizedMessage)
-                    isAllSuccess = false
-                } finally {
-                    latch.countDown()
+                            // sleep
+                            Thread.sleep(3000 + (Math.random() * 1000).toLong())
+
+                            seatService.purchaseSeat(
+                                artId = art.id,
+                                seatId = seat.id,
+                                userId = user.id,
+                            )
+                        } catch (e: SeatSoldOutException) {
+                            println("user: ${user.id}, seat: ${seat.id} 예외 발생.." + e.localizedMessage)
+                            isAllSuccess = false
+                        } catch (e: Exception) {
+                            println("user: ${user.id}, seat: ${seat.id} 예외 발생.." + e.localizedMessage)
+                            isAllSuccess = false
+                        } finally {
+                            latch.countDown()
+                        }
+                    }
                 }
-            }
-        }
 
-        latch.await()
+                latch.await()
+            }
+
+        // then
+        println(measureTime)
         isAllSuccess shouldBe true
     }
 
