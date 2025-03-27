@@ -9,6 +9,7 @@ spring:
       - file
       - schedule
       - redis
+      - actuator
 
 springdoc:
   swagger-ui:
