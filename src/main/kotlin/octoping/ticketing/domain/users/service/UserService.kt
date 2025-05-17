@@ -8,8 +8,13 @@ import org.springframework.stereotype.Service
 class UserService(
     private val userRepository: UserRepository,
 ) {
-    fun createUser(username: String) {
-        val user = User(username = username)
+    fun createUser(username: String, email: String) {
+        val user = User(username = username, email = email)
         userRepository.save(user)
+    }
+
+    fun findUserById(userId: Long): User {
+        return userRepository.findById(userId)
+            ?: throw IllegalArgumentException("User not found with id: $userId")
     }
 }

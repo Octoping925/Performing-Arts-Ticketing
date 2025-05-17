@@ -10,11 +10,14 @@ class UserEntity(
     id: Long = 0,
     @Column(name = "username", nullable = false)
     var username: String,
+    @Column(name = "email", nullable = false)
+    var email: String,
 ) : BaseEntity(id) {
     fun toUser() =
         User(
             id = this.id,
             username = this.username,
+            email = this.email,
         )
 
     companion object {
@@ -22,6 +25,7 @@ class UserEntity(
             UserEntity(
                 id = user.id,
                 username = user.username,
+                email = user.email,
             )
     }
 }

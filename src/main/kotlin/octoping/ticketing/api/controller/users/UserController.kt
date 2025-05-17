@@ -13,7 +13,8 @@ class UserController(
     @GetMapping("/users")
     fun createUser(
         @RequestParam username: String,
+        @RequestParam email: String,
     ) {
-        userService.createUser(username)
+        userService.createUser(username, email)
     }
 }
