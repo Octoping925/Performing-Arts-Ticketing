@@ -2,22 +2,27 @@ package octoping.ticketing.domain.ticket.model
 
 import octoping.ticketing.domain.exception.ValidationException
 import java.time.LocalDateTime
+import java.util.UUID
 
 class Ticket(
     id: Long = 0,
+    reservationId: UUID = UUID.randomUUID(),
     artId: Long,
     originalPrice: Long,
     boughtPrice: Long,
     boughtUserId: Long,
+    seatId: Long,
     isRefunded: Boolean = false,
     boughtAt: LocalDateTime = LocalDateTime.now(),
     refundedAt: LocalDateTime? = null,
 ) {
     private val _id = id
+    private val _reservationId = reservationId
     private val _artId = artId
     private val _originalPrice = originalPrice
     private val _boughtPrice = boughtPrice
     private val _boughtUserId = boughtUserId
+    private val _seatId = seatId
     private var _isRefunded = isRefunded
     private val _boughtAt = boughtAt
     private val _refundedAt = refundedAt
@@ -28,6 +33,9 @@ class Ticket(
     val artId: Long
         get() = _artId
 
+    val reservationId: UUID
+        get() = _reservationId
+
     val originalPrice: Long
         get() = _originalPrice
 
@@ -36,6 +44,9 @@ class Ticket(
 
     val boughtUserId: Long
         get() = _boughtUserId
+
+    val seatId: Long
+        get() = _seatId
 
     val isRefunded: Boolean
         get() = _isRefunded
