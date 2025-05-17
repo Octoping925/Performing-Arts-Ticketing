@@ -16,6 +16,7 @@ import octoping.ticketing.domain.users.exception.UnauthorizedException
 import octoping.ticketing.domain.users.repository.UserRepository
 import octoping.ticketing.persistence.model.seats.SeatLockException
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -30,16 +31,11 @@ class SeatService(
     private val ticketRepository: TicketRepository,
 ) {
     @Transactional
-    fun lockSeat(
-        seatId: Long,
-        userId: Long,
-    ) {
+    fun lockSeat(seatId: Long, userId: Long) {
         // Seat의 락은 Redis에 저장하지만, 이를 저장할 때에도 동시성 이슈가 생길 수 있어 분산락 구현
         lockManager.lock(Lock.SEAT_PURCHASE, seatId) {
-            val seat = (
-                seatRepository.findById(seatId)
-                    ?: throw NotFoundException("Seat not found")
-            )
+            val seat = seatRepository.findById(seatId)
+                ?: throw NotFoundException("Seat not found")
 
             if (seat.isSoldOut) {
                 throw SeatSoldOutException()
@@ -50,10 +46,7 @@ class SeatService(
     }
 
     @Transactional
-    fun unlockSeat(
-        seatId: Long,
-        userId: Long,
-    ) {
+    fun unlockSeat(seatId: Long, userId: Long) {
         val lock =
             seatLockRepository.getSeatLock(seatId)
                 ?: return
@@ -97,15 +90,12 @@ class SeatService(
 
         seatRepository.save(seat)
         ticketRepository.save(ticket)
-        eventPublisher.publishEvent(SeatPurchaseEvent(seat.id, user.id))
+        eventPublisher.publishEvent(SeatPurchaseEvent(ticket))
 
         return ticket
     }
 
-    private fun validateIsLocked(
-        seatId: Long,
-        userId: Long,
-    ) {
+    private fun validateIsLocked(seatId: Long, userId: Long) {
         val lock =
             seatLockRepository.getSeatLock(seatId)
                 ?: throw SeatLockException.TOO_LATE

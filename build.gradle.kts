@@ -27,6 +27,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
@@ -34,6 +36,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.kafka:spring-kafka")
     implementation("io.github.oshai:kotlin-logging-jvm:7.0.0")
+    implementation("com.amazonaws:aws-java-sdk-ses:1.12.723")
+
 
     runtimeOnly("com.h2database:h2")
     runtimeOnly("com.mysql:mysql-connector-j")
