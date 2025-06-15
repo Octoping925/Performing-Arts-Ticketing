@@ -14,9 +14,9 @@ class Seat(
     isSoldOut: Boolean,
 ) {
     private val _id: Long = id
-    private val _artId: Long
-    private val _artSeatId: Long
-    private var _isSoldOut: Boolean
+    private val _artId: Long = artId
+    private val _artSeatId: Long = artSeatId
+    private var _isSoldOut: Boolean = isSoldOut
 
     val id: Long
         get() = _id
@@ -30,17 +30,7 @@ class Seat(
     val isSoldOut: Boolean
         get() = _isSoldOut
 
-    init {
-        _artId = artId
-        _artSeatId = artSeatId
-        _isSoldOut = isSoldOut
-    }
-
-    fun buyTicket(
-        user: User,
-        artSeat: ArtSeat,
-        discountCoupon: DiscountCoupon = NoDiscountCoupon(),
-    ): Ticket {
+    fun buyTicket(user: User, artSeat: ArtSeat, discountCoupon: DiscountCoupon = NoDiscountCoupon()): Ticket {
         if (user.isNew()) {
             throw ValidationException("저장되지 않은 유저입니다")
         }
@@ -56,6 +46,8 @@ class Seat(
             originalPrice = artSeat.price,
             boughtPrice = discountCoupon.discount(artSeat.price),
             boughtUserId = user.id,
+            reservationId = TODO(),
+            seatId = TODO(),
         )
     }
 }
