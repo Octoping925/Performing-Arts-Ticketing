@@ -96,10 +96,18 @@ class StressTest(
         isAllSuccess shouldBe true
     }
 
-    private fun createSeatPrice(
-        art: Art,
-        seat: Seat,
-    ): SeatPrice =
+    @Rollback(false)
+    @Test
+    @Tag("Stress")
+    fun createStub() {
+        val users = createUser(3)
+        val art = createArt()
+        val artSeat = createArtSeat(art)
+        val seats = createSeat(art.id, artSeat.id, 1000)
+        val seatPrice = createSeatPrice(art, seats[0])
+    }
+
+    private fun createSeatPrice(art: Art, seat: Seat): SeatPrice =
         seatPriceRepository.save(
             SeatPrice(
                 id = 0,
@@ -133,14 +141,10 @@ class StressTest(
     private fun createUser(range: Int): List<User> =
         (1..range)
             .map {
-                User(username = "user-$it")
+                User(username = "user-$it", email = "user$it@naver.com")
             }.let { userRepository.saveAll(it) }
 
-    private fun createSeat(
-        artId: Long,
-        artSeatId: Long,
-        quantity: Int,
-    ): List<Seat> =
+    private fun createSeat(artId: Long, artSeatId: Long, quantity: Int): List<Seat> =
         (1..quantity)
             .map {
                 Seat(
